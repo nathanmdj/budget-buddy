@@ -21,6 +21,7 @@ const RouteChild = z.object({
   label: z.string(),
   path: z.string(),
   Icon: z.custom<React.ReactNode>().optional(),
+  IconActive: z.custom<React.ReactNode>().optional(),
   end: RouteMatchingEnd,
   children: z.array(RouteSubChild).default([]).optional(),
   collapsible: z.boolean().default(false).optional(),

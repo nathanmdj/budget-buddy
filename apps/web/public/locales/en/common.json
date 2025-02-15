@@ -63,7 +63,10 @@
     "dashboard": "Dashboard",
     "settings": "Settings",
     "profile": "Profile",
-    "application": "Application"
+    "application": "Application",
+    "transactions": "Transactions",
+    "accounts": "Accounts",
+    "planner": "Planner"
   },
   "roles": {
     "owner": {

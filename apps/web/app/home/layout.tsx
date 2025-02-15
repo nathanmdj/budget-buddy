@@ -19,6 +19,7 @@ import { requireUserInServerComponent } from '~/lib/server/require-user-in-serve
 import { HomeMenuNavigation } from './_components/home-menu-navigation';
 import { HomeMobileNavigation } from './_components/home-mobile-navigation';
 import { HomeSidebar } from './_components/home-sidebar';
+import MobileBottomNav from './_components/mobile-nav';
 
 function HomeLayout({ children }: React.PropsWithChildren) {
   const style = use(getLayoutStyle());
@@ -37,19 +38,22 @@ function SidebarLayout({ children }: React.PropsWithChildren) {
   const [user] = use(Promise.all([requireUserInServerComponent()]));
 
   return (
-    <SidebarProvider minimized={sidebarMinimized}>
-      <Page style={'sidebar'}>
-        <PageNavigation>
-          <HomeSidebar user={user} />
-        </PageNavigation>
+    <>
+      <SidebarProvider minimized={sidebarMinimized}>
+        <Page style={'sidebar'}>
+          <PageNavigation>
+            <HomeSidebar user={user} />
+          </PageNavigation>
 
-        <PageMobileNavigation className={'flex items-center justify-between'}>
-          <MobileNavigation />
-        </PageMobileNavigation>
+          <PageMobileNavigation className={'flex items-center justify-between'}>
+            <MobileNavigation />
+          </PageMobileNavigation>
 
-        {children}
-      </Page>
-    </SidebarProvider>
+          {children}
+        </Page>
+      </SidebarProvider>
+      <MobileBottomNav />
+    </>
   );
 }
 

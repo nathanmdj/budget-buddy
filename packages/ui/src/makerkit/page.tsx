@@ -35,14 +35,13 @@ function PageWithSidebar(props: PageProps) {
       <div
         className={
           props.contentContainerClassName ??
-          'mx-auto flex h-screen w-full flex-col overflow-y-auto bg-inherit'
+          'mx-auto flex h-screen w-full flex-col bg-inherit'
         }
       >
         {MobileNavigation}
-
         <div
           className={
-            'flex flex-1 flex-col overflow-y-auto bg-background px-4 lg:px-0'
+            'flex flex-1 flex-col overflow-y-auto bg-inherit px-4 lg:px-0'
           }
         >
           {Children}
@@ -73,7 +72,12 @@ function PageWithHeader(props: PageProps) {
   const { Navigation, Children, MobileNavigation } = getSlotsFromPage(props);
 
   return (
-    <div className={cn('flex h-screen flex-1 flex-col', props.className)}>
+    <div
+      className={cn(
+        'flex h-[calc(100vh-70px)] flex-1 flex-col',
+        props.className,
+      )}
+    >
       <div
         className={
           props.contentContainerClassName ?? 'flex flex-1 flex-col space-y-4'

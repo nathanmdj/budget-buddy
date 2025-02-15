@@ -21,7 +21,7 @@ export default async function RootLayout({
 
   return (
     <html lang={language} className={className}>
-      <body>
+      <body className={'overflow-hidden'}>
         <RootProviders theme={theme} lang={language}>
           {children}
         </RootProviders>

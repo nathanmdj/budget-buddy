@@ -154,6 +154,24 @@ function getPatterns() {
         }
       },
     },
+    {
+      pattern: new URLPattern({ pathname: '/' }),
+      handler: async (req: NextRequest, res: NextResponse) => {
+        const {
+          data: { user },
+        } = await getUser(req, res);
+
+        if (!user) {
+          return NextResponse.redirect(
+            new URL(pathsConfig.auth.signIn, req.nextUrl.origin).href,
+          );
+        }
+
+        return NextResponse.redirect(
+          new URL(pathsConfig.app.home, req.nextUrl.origin).href,
+        );
+      },
+    },
   ];
 }
 

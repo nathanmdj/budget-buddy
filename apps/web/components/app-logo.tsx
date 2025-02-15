@@ -41,7 +41,8 @@ export function AppLogo({
 
   return (
     <Link aria-label={label ?? 'Home Page'} href={href ?? '/'}>
-      <LogoImage className={className} />
+      {/* <LogoImage className={className} /> */}
+      <span className="text-xl font-bold">BudgetBuddy</span>
     </Link>
   );
 }

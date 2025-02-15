@@ -117,7 +117,8 @@ export type Database = {
     }
     Enums: {
       fund_account_type:
-        | "checking"
+        | "bank"
+        | "e-wallet"
         | "savings"
         | "investment"
         | "cash"

@@ -1,8 +1,8 @@
 'use client';
 
-import { startTransition, useState } from 'react';
+import { startTransition } from 'react';
 
-import { Plus } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -12,7 +12,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@kit/ui/dialog';
 import {
   Form,
@@ -31,32 +30,34 @@ import {
   SelectValue,
 } from '@kit/ui/select';
 
-import { createAccount } from '../server/server-actions';
+import { deleteAccount, updateAccount } from '../server/server-actions';
 import { Account } from './AccountTypes';
 
-export function AddAccountDialog() {
-  const [isOpen, setIsOpen] = useState(false);
-
+export function UpdateAccountDialog({
+  account,
+  isOpen,
+  setIsOpen,
+}: {
+  account: Account;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+}) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen} modal>
-      <DialogTrigger asChild>
-        <Button className="mt-4 w-full">
-          <Plus className="mr-2 h-4 w-4" /> Add New Account
-        </Button>
-      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Account</DialogTitle>
+          <DialogTitle>Update Account</DialogTitle>
         </DialogHeader>
         <CreateFundAccountForm
+          account={account}
           onSubmit={(data) => {
             startTransition(() => {
-              const promise = createAccount(data);
+              const promise = updateAccount(data);
 
               toast.promise(() => promise, {
-                loading: 'Creating account...',
-                success: 'Account created successfully',
-                error: 'Failed to create account',
+                loading: 'Updating account...',
+                success: 'Account updated successfully',
+                error: 'Failed to update account',
               });
 
               setIsOpen(false);
@@ -70,14 +71,17 @@ export function AddAccountDialog() {
 
 function CreateFundAccountForm({
   onSubmit,
+  account,
 }: {
   onSubmit: (data: Account) => void;
+  account: Account;
 }) {
   const form = useForm<Account>({
     defaultValues: {
-      name: '',
-      type: 'cash',
-      balance: 0,
+      id: account.id,
+      name: account.name,
+      type: account.type,
+      balance: account.balance,
     },
   });
 
@@ -139,9 +143,29 @@ function CreateFundAccountForm({
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Create
-        </Button>
+        <div className="flex gap-2">
+          <Button type="submit" className="w-[80%]">
+            Update
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            className="w-[20%]"
+            onClick={() => {
+              startTransition(() => {
+                const promise = deleteAccount(account.id);
+
+                toast.promise(() => promise, {
+                  loading: 'Deleting account...',
+                  success: 'Account deleted successfully',
+                  error: 'Failed to delete account',
+                });
+              });
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </form>
     </Form>
   );

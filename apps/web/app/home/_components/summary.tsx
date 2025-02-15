@@ -1,11 +1,22 @@
+import { getSupabaseServerClient } from '@kit/supabase/server-client';
 import { Card, CardContent } from '@kit/ui/card';
 import { Progress } from '@kit/ui/progress';
 
 import { formatCurrency } from '~/lib/utils';
 
-export default function Summary() {
-  // These would typically come from your state management or API
-  const totalBalance = 5000;
+import TotalBalance from './total-balance';
+
+export default async function Summary() {
+  // These would typica lly come from your state management or API
+  const supabase = getSupabaseServerClient();
+  const { data, error } = await supabase.from('fund_accounts').select('*');
+
+  if (error) {
+    throw error;
+  }
+
+  const totalBalance = data.reduce((acc, account) => acc + account.balance, 0);
+
   const monthlyBudget = 2000;
   const spent = 1500;
   const remaining = monthlyBudget - spent;
@@ -20,12 +31,7 @@ export default function Summary() {
 
   return (
     <div className="space-y-4 p-2">
-      <Card className="bg-primary text-primary-foreground">
-        <CardContent className="flex items-center justify-between p-4">
-          <h2 className="font-semibold">Total Balance</h2>
-          <p className="text-lg font-bold">{formatCurrency(totalBalance)}</p>
-        </CardContent>
-      </Card>
+      <TotalBalance totalBalance={totalBalance} />
       <Card className="bg-white">
         <CardContent className="pt-6">
           <h2 className="mb-2 text-xl font-semibold">Monthly Budget</h2>

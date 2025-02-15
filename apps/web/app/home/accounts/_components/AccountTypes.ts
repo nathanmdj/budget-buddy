@@ -2,7 +2,14 @@ export type Account = {
   id: string;
   account_id: string;
   name: string;
-  type: 'checking' | 'savings' | 'investment' | 'cash' | 'card' | 'other';
+  type:
+    | 'bank'
+    | 'e-wallet'
+    | 'savings'
+    | 'investment'
+    | 'cash'
+    | 'card'
+    | 'other';
   balance: number;
   created_at: string | null;
   updated_at: string | null;
@@ -13,7 +20,7 @@ export const initialAccounts: Account[] = [
     id: '1',
     account_id: 'acc_1',
     name: 'Main Checking',
-    type: 'checking',
+    type: 'bank',
     balance: 2500,
     created_at: null,
     updated_at: null,

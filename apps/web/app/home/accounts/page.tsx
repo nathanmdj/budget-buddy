@@ -1,48 +1,18 @@
-'use client';
+import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-import { useState } from 'react';
-
-import { AccountCard } from './_components/AccountCard';
 import AccountList from './_components/AccountList';
-import type { Account } from './_components/AccountTypes';
-import { initialAccounts } from './_components/AccountTypes';
 import { AddAccountDialog } from './_components/AddAccountDialog';
 import { TotalBalance } from './_components/TotalBalance';
 
-export default function AccountsPage() {
-  const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editValue, setEditValue] = useState<string>('');
+export default async function AccountsPage() {
+  const supabase = getSupabaseServerClient();
+  const { data, error } = await supabase.from('fund_accounts').select('*');
 
-  const totalBalance = accounts.reduce(
-    (sum, account) => sum + account.balance,
-    0,
-  );
+  if (error) {
+    throw error;
+  }
 
-  const handleEdit = (id: number, currentBalance: number) => {
-    setEditingId(id);
-    setEditValue(currentBalance.toString());
-  };
-
-  const handleSave = (id: number) => {
-    setAccounts(
-      accounts.map((account) =>
-        account.id === id
-          ? { ...account, balance: Number.parseFloat(editValue) || 0 }
-          : account,
-      ),
-    );
-    setEditingId(null);
-  };
-
-  const handleCancel = () => {
-    setEditingId(null);
-  };
-
-  const addNewAccount = (newAccount: Omit<Account, 'id'>) => {
-    const id = Math.max(...accounts.map((a) => a.id)) + 1;
-    setAccounts([...accounts, { ...newAccount, id }]);
-  };
+  const totalBalance = data.reduce((acc, account) => acc + account.balance, 0);
 
   return (
     <div className="container mx-auto max-w-2xl p-2">
@@ -50,9 +20,8 @@ export default function AccountsPage() {
 
       <TotalBalance balance={totalBalance} />
 
-      <AccountList />
-
-      <AddAccountDialog onAddAccount={addNewAccount} />
+      <AccountList accounts={data} />
+      <AddAccountDialog />
     </div>
   );
 }

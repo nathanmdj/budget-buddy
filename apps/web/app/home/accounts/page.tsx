@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
+import { PageBody, PageHeader } from '@kit/ui/page';
 
 import AccountList from './_components/AccountList';
 import { AddAccountDialog } from './_components/AddAccountDialog';
@@ -15,13 +16,14 @@ export default async function AccountsPage() {
   const totalBalance = data.reduce((acc, account) => acc + account.balance, 0);
 
   return (
-    <div className="container mx-auto max-w-2xl p-2">
-      <h1 className="mb-6 text-2xl font-bold">Your Accounts</h1>
+    <>
+      <PageHeader title={'Your Accounts'} description={''} />
+      <PageBody className={'p-2'}>
+        <TotalBalance balance={totalBalance} />
 
-      <TotalBalance balance={totalBalance} />
-
-      <AccountList accounts={data} />
-      <AddAccountDialog />
-    </div>
+        <AccountList accounts={data} />
+        <AddAccountDialog />
+      </PageBody>
+    </>
   );
 }

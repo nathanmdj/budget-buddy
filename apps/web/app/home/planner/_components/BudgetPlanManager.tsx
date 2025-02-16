@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
@@ -32,7 +32,6 @@ type Props = {
   onSelectPlan: (id: number) => void;
   onCreatePlan: (plan: Omit<BudgetPlan, 'id'>) => void;
   onUpdatePlan: (plan: BudgetPlan) => void;
-  onDeletePlan: (id: number) => void;
 };
 
 export function BudgetPlanManager({
@@ -41,7 +40,6 @@ export function BudgetPlanManager({
   onSelectPlan,
   onCreatePlan,
   onUpdatePlan,
-  onDeletePlan,
 }: Props) {
   const [editedPlan, setEditedPlan] = useState<BudgetPlan | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -189,7 +187,9 @@ export function BudgetPlanManager({
           <div className="flex space-x-2">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline">Edit</Button>
+                <Button variant="outline">
+                  <Pencil className="h-4 w-4" />
+                </Button>
               </SheetTrigger>
               <SheetContent>
                 <SheetHeader>
@@ -249,13 +249,6 @@ export function BudgetPlanManager({
                 )}
               </SheetContent>
             </Sheet>
-            <Button
-              variant="destructive"
-              size="icon"
-              onClick={() => onDeletePlan(selectedPlan.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </CardContent>

@@ -12,16 +12,24 @@ import type { BudgetCategory } from './types';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const CHART_COLORS = [
-  '#FF6384',
-  '#36A2EB',
-  '#FFCE56',
-  '#4BC0C0',
-  '#9966FF',
-  '#FF9F40',
-  '#FF6384',
-  '#36A2EB',
-  '#FFCE56',
-  '#4BC0C0',
+  '#FF6384', // Bright Pink
+  '#36A2EB', // Blue
+  '#FFCE56', // Yellow
+  '#4BC0C0', // Teal
+  '#9966FF', // Purple
+  '#FF9F40', // Orange
+  '#33CC99', // Green
+  '#FF6666', // Coral
+  '#6699FF', // Light Blue
+  '#CC99FF', // Lavender
+  '#FFCC99', // Peach
+  '#66CCCC', // Aqua
+  '#FF99CC', // Pink
+  '#99CC33', // Lime Green
+  '#CC66FF', // Violet
+  '#FFCC66', // Gold
+  '#66CC99', // Mint
+  '#CC9966', // Tan
 ];
 
 export function BudgetChart({
@@ -41,13 +49,13 @@ export function BudgetChart({
     if (unallocatedAmount <= 0) return categories;
 
     return [
-      ...categories,
       {
         id: categories.length + 1,
         name: 'Unallocated',
         allocated: unallocatedAmount,
         spent: 0,
       },
+      ...categories,
     ];
   }, [categories, income, totalBudget]);
 

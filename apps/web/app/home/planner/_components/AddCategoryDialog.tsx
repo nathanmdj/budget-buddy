@@ -21,20 +21,23 @@ export function AddCategoryDialog({
 }: {
   onAddCategory: (category: Omit<BudgetCategory, 'id'>) => void;
 }) {
+  const [open, setOpen] = useState(false);
   const [newCategory, setNewCategory] = useState<Omit<BudgetCategory, 'id'>>({
     name: '',
     allocated: 0,
     spent: 0,
+    items: [],
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAddCategory(newCategory);
-    setNewCategory({ name: '', allocated: 0, spent: 0 });
+    setNewCategory({ name: '', allocated: 0, spent: 0, items: [] });
+    setOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="mt-4 w-full">
           <Plus className="mr-2 h-4 w-4" /> Add New Category
@@ -61,7 +64,7 @@ export function AddCategoryDialog({
               required
             />
           </div>
-          <div>
+          {/* <div>
             <label
               htmlFor="allocated"
               className="block text-sm font-medium text-gray-700"
@@ -80,7 +83,7 @@ export function AddCategoryDialog({
               }
               required
             />
-          </div>
+          </div> */}
           <Button type="submit" className="w-full">
             Add Category
           </Button>

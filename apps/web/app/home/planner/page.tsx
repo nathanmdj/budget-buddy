@@ -12,7 +12,16 @@ export default async function BudgetPlannerPage() {
     month: 'long',
   });
   const currentYear = new Date().getFullYear();
-  const plans = rawPlans?.map((plan) => ({
+  //sort plans by year and month
+  const sortedPlans =
+    rawPlans?.sort((a, b) => {
+      if (a.year === b.year) {
+        return a.month.localeCompare(b.month);
+      }
+      return a.year - b.year;
+    }) ?? [];
+
+  const plans = sortedPlans?.map((plan) => ({
     id: plan.id,
     month: plan.month,
     year: plan.year,
@@ -20,20 +29,18 @@ export default async function BudgetPlannerPage() {
     categories: (plan.categories as BudgetCategory[]) ?? [],
   })) as BudgetPlan[] | null;
 
-  const initialPlan =
+  const selectedPlan =
     plans?.find(
       (plan) => plan.month === currentMonth && plan.year === currentYear,
     ) ?? null;
 
-  console.log('plans', plans);
-  console.log('initialPlan', initialPlan);
   return (
     <>
       <PageHeader title={'Budget Planner'} description={''} />
       <PageBody className={'mb-20 p-2'}>
         <ClientBudgetPlanner
           initialPlans={plans}
-          initialSelectedPlan={initialPlan}
+          initialSelectedPlan={selectedPlan}
         />
       </PageBody>
     </>

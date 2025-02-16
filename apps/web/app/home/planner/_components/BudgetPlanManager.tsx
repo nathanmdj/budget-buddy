@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 
@@ -22,9 +22,11 @@ import {
   SheetTrigger,
 } from '@kit/ui/sheet';
 
+import { formatCurrency } from '~/lib/utils';
+
 import { AddCategoryDialog } from './AddCategoryDialog';
 import { CreatePlanForm } from './CreatePlanForm';
-import type { BudgetCategory, BudgetPlan } from './types';
+import type { BudgetCategory, BudgetItem, BudgetPlan } from './types';
 
 type Props = {
   plans: BudgetPlan[];
@@ -41,11 +43,10 @@ export function BudgetPlanManager({
   onCreatePlan,
   onUpdatePlan,
 }: Props) {
-  const [editedPlan, setEditedPlan] = useState<BudgetPlan | null>(
-    selectedPlan ?? null,
-  );
+  const [editedPlan, setEditedPlan] = useState<BudgetPlan | null>(selectedPlan);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-
+  console.log('editedPlan', editedPlan);
+  console.log('selectedPlan', selectedPlan);
   const currentIndex = selectedPlan
     ? plans.findIndex((p) => p.id === selectedPlan.id)
     : -1;
@@ -79,16 +80,16 @@ export function BudgetPlanManager({
     setEditedPlan(updatedPlan);
   };
 
-  const handleEditCategory = (editedCategory: BudgetCategory) => {
-    if (!editedPlan) return;
-    const updatedPlan = {
-      ...editedPlan,
-      categories: editedPlan.categories.map((category) =>
-        category.id === editedCategory.id ? editedCategory : category,
-      ),
-    };
-    setEditedPlan(updatedPlan);
-  };
+  // const handleEditCategory = (editedCategory: BudgetCategory) => {
+  //   if (!editedPlan) return;
+  //   const updatedPlan = {
+  //     ...editedPlan,
+  //     categories: editedPlan.categories.map((category) =>
+  //       category.id === editedCategory.id ? editedCategory : category,
+  //     ),
+  //   };
+  //   setEditedPlan(updatedPlan);
+  // };
 
   const handleDeleteCategory = (id: number) => {
     if (!editedPlan) return;
@@ -104,6 +105,107 @@ export function BudgetPlanManager({
   const handleSaveEdit = () => {
     if (!editedPlan) return;
     onUpdatePlan(editedPlan);
+  };
+
+  useEffect(() => {
+    setEditedPlan(selectedPlan);
+  }, [selectedPlan]);
+
+  function CategoryItemsList({
+    category,
+    onUpdateItems,
+  }: {
+    category: BudgetCategory;
+    onUpdateItems: (categoryId: number, items: BudgetItem[]) => void;
+  }) {
+    const [newItemName, setNewItemName] = useState('');
+    const [newItemAmount, setNewItemAmount] = useState<number>(0);
+
+    const handleAddItem = () => {
+      if (!newItemName || newItemAmount <= 0) return;
+
+      const newItem: BudgetItem = {
+        id:
+          Math.max(...(category?.items?.map((item) => item.id) ?? [0]), 0) + 1,
+        name: newItemName,
+        amount: newItemAmount,
+      };
+
+      onUpdateItems(category.id, [...(category?.items ?? []), newItem]);
+      setNewItemName('');
+      setNewItemAmount(0);
+    };
+
+    const handleDeleteItem = (itemId: number) => {
+      onUpdateItems(
+        category.id,
+        category.items.filter((item) => item.id !== itemId),
+      );
+    };
+
+    return (
+      <div className="space-y-2">
+        <div className="grid grid-cols-[1fr,auto,auto] items-center gap-2">
+          <Input
+            placeholder="Item name"
+            value={newItemName}
+            onChange={(e) => setNewItemName(e.target.value)}
+          />
+          <Input
+            type="number"
+            placeholder="Amount"
+            className="w-24"
+            value={newItemAmount || ''}
+            onChange={(e) => setNewItemAmount(Number(e.target.value))}
+          />
+          <Button size="sm" onClick={handleAddItem}>
+            Add
+          </Button>
+        </div>
+
+        <div className="space-y-1">
+          {category?.items?.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center justify-between rounded-md bg-muted/50 p-2"
+            >
+              <span>{item.name}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  {formatCurrency(item.amount)}
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8"
+                  onClick={() => handleDeleteItem(item.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const handleUpdateItems = (categoryId: number, items: BudgetItem[]) => {
+    if (!editedPlan) return;
+
+    const updatedPlan = {
+      ...editedPlan,
+      categories: editedPlan.categories.map((category) =>
+        category.id === categoryId
+          ? {
+              ...category,
+              items,
+              allocated: items.reduce((sum, item) => sum + item.amount, 0),
+            }
+          : category,
+      ),
+    };
+    setEditedPlan(updatedPlan);
   };
 
   if (!selectedPlan) {
@@ -192,7 +294,7 @@ export function BudgetPlanManager({
                   <Pencil className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent>
+              <SheetContent className="w-full max-w-md overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle>Edit Budget Plan</SheetTitle>
                 </SheetHeader>
@@ -212,40 +314,42 @@ export function BudgetPlanManager({
                       }
                       className="mb-4"
                     />
-                    <h3 className="mb-2 font-semibold">Categories</h3>
-                    {editedPlan.categories.map((category) => (
-                      <div
-                        key={category.id}
-                        className="mb-2 flex items-center justify-between"
-                      >
-                        <span>{category.name}</span>
-                        <div className="flex items-center space-x-2">
-                          <Input
-                            type="number"
-                            value={category.allocated}
-                            onChange={(e) =>
-                              handleEditCategory({
-                                ...category,
-                                allocated:
-                                  Number.parseFloat(e.target.value) || 0,
-                              })
-                            }
-                            className="w-24"
-                          />
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => handleDeleteCategory(category.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+
+                    <div className="space-y-6">
+                      {editedPlan.categories.map((category) => (
+                        <div key={category.id} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium">{category.name}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                Total: {formatCurrency(category.allocated)}
+                              </p>
+                            </div>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteCategory(category.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <div className="border-l-2 border-muted pl-4">
+                            <CategoryItemsList
+                              category={category}
+                              onUpdateItems={handleUpdateItems}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    <AddCategoryDialog onAddCategory={handleAddCategory} />
-                    <Button onClick={handleSaveEdit} className="mt-4 w-full">
-                      Save Changes
-                    </Button>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 space-y-4">
+                      <AddCategoryDialog onAddCategory={handleAddCategory} />
+                      <Button onClick={handleSaveEdit} className="w-full">
+                        Save Changes
+                      </Button>
+                    </div>
                   </div>
                 )}
               </SheetContent>

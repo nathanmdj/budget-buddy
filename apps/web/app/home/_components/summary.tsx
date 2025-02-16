@@ -14,34 +14,33 @@ export default async function Summary() {
   });
   const currentYear = new Date().getFullYear();
   const { data, error } = await supabase.from('fund_accounts').select('*');
-  const { data: budgetPlans } = await supabase
-    .from('budget_plans')
-    .select('*')
-    .eq('month', currentMonth)
-    .eq('year', currentYear);
+  const { data: budgetPlans } = await supabase.from('budget_plans').select('*');
 
-  console.log('budgetPlans', budgetPlans);
   if (error) {
     throw error;
   }
-
+  const filteredBudgetPlans = Array.isArray(budgetPlans)
+    ? budgetPlans.filter(
+        (plan) => plan.month === currentMonth && plan.year === currentYear,
+      ).length > 0
+      ? budgetPlans.filter(
+          (plan) => plan.month === currentMonth && plan.year === currentYear,
+        )
+      : budgetPlans.slice(0, 1)
+    : [];
   const totalBalance = data.reduce((acc, account) => acc + account.balance, 0);
 
-  const budgeted =
-    budgetPlans?.reduce((acc, plan) => {
-      const categories = (plan.categories as { allocated: number }[]) ?? [];
-      return (
-        acc + categories.reduce((sum, category) => sum + category.allocated, 0)
-      );
-    }, 0) ?? 0;
+  const budgeted = filteredBudgetPlans.reduce((acc, plan) => {
+    const categories = (plan.categories as { allocated: number }[]) ?? [];
+    return (
+      acc + categories.reduce((sum, category) => sum + category.allocated, 0)
+    );
+  }, 0);
 
-  const spent =
-    budgetPlans?.reduce((acc, plan) => {
-      const categories = (plan.categories as { spent: number }[]) ?? [];
-      return (
-        acc + categories.reduce((sum, category) => sum + category.spent, 0)
-      );
-    }, 0) ?? 0;
+  const spent = filteredBudgetPlans.reduce((acc, plan) => {
+    const categories = (plan.categories as { spent: number }[]) ?? [];
+    return acc + categories.reduce((sum, category) => sum + category.spent, 0);
+  }, 0);
 
   const remaining = budgeted - spent;
   const percentSpent = (spent / (budgeted || 1)) * 100;
@@ -57,7 +56,9 @@ export default async function Summary() {
       <TotalBalance totalBalance={totalBalance} />
       <Card className="bg-white">
         <CardContent className="pt-6">
-          <h2 className="mb-2 text-xl font-semibold">Monthly Budget</h2>
+          <h2 className="mb-2 text-xl font-semibold">
+            {filteredBudgetPlans[0]?.month} Budget
+          </h2>
           <div className="mb-2 flex items-end justify-between">
             <div>
               <p className="text-sm text-gray-600">Remaining</p>

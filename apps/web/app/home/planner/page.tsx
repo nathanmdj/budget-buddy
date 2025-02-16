@@ -32,7 +32,9 @@ export default async function BudgetPlannerPage() {
   const selectedPlan =
     plans?.find(
       (plan) => plan.month === currentMonth && plan.year === currentYear,
-    ) ?? null;
+    ) ??
+    plans?.[0] ??
+    null;
 
   return (
     <>

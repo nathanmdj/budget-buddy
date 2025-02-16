@@ -45,8 +45,7 @@ export function BudgetPlanManager({
 }: Props) {
   const [editedPlan, setEditedPlan] = useState<BudgetPlan | null>(selectedPlan);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  console.log('editedPlan', editedPlan);
-  console.log('selectedPlan', selectedPlan);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const currentIndex = selectedPlan
     ? plans.findIndex((p) => p.id === selectedPlan.id)
     : -1;
@@ -105,6 +104,7 @@ export function BudgetPlanManager({
   const handleSaveEdit = () => {
     if (!editedPlan) return;
     onUpdatePlan(editedPlan);
+    setIsEditDialogOpen(false);
   };
 
   useEffect(() => {
@@ -288,7 +288,7 @@ export function BudgetPlanManager({
             <p>Categories: {selectedPlan.categories.length}</p>
           </div>
           <div className="flex space-x-2">
-            <Sheet>
+            <Sheet open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
               <SheetTrigger asChild>
                 <Button variant="outline">
                   <Pencil className="h-4 w-4" />

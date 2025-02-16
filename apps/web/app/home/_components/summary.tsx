@@ -9,19 +9,42 @@ import TotalBalance from './total-balance';
 export default async function Summary() {
   // These would typica lly come from your state management or API
   const supabase = getSupabaseServerClient();
+  const currentMonth = new Date().toLocaleString('en-US', {
+    month: 'long',
+  });
+  const currentYear = new Date().getFullYear();
   const { data, error } = await supabase.from('fund_accounts').select('*');
+  const { data: budgetPlans } = await supabase
+    .from('budget_plans')
+    .select('*')
+    .eq('month', currentMonth)
+    .eq('year', currentYear);
 
+  console.log('budgetPlans', budgetPlans);
   if (error) {
     throw error;
   }
 
   const totalBalance = data.reduce((acc, account) => acc + account.balance, 0);
 
-  const monthlyBudget = 2000;
-  const spent = 1500;
-  const remaining = monthlyBudget - spent;
-  const percentSpent = (spent / monthlyBudget) * 100;
-  const lastMonthSpent = 1800;
+  const budgeted =
+    budgetPlans?.reduce((acc, plan) => {
+      const categories = (plan.categories as { allocated: number }[]) ?? [];
+      return (
+        acc + categories.reduce((sum, category) => sum + category.allocated, 0)
+      );
+    }, 0) ?? 0;
+
+  const spent =
+    budgetPlans?.reduce((acc, plan) => {
+      const categories = (plan.categories as { spent: number }[]) ?? [];
+      return (
+        acc + categories.reduce((sum, category) => sum + category.spent, 0)
+      );
+    }, 0) ?? 0;
+
+  const remaining = budgeted - spent;
+  const percentSpent = (spent / (budgeted || 1)) * 100;
 
   const getStatusColor = (percentSpent: number) => {
     if (percentSpent < 75) return 'text-green-600';
@@ -47,7 +70,7 @@ export default async function Summary() {
             <div className="text-right">
               <p className="text-sm text-gray-600">Total Budget</p>
               <p className="text-xl font-semibold">
-                {formatCurrency(monthlyBudget)}
+                {formatCurrency(budgeted)}
               </p>
             </div>
           </div>
@@ -55,16 +78,6 @@ export default async function Summary() {
           <div className="flex justify-between text-sm text-gray-600">
             <span>Spent: {formatCurrency(spent)}</span>
             <span>{percentSpent.toFixed(0)}%</span>
-          </div>
-          <div className="mt-4 text-sm">
-            <span className="text-gray-600">Last month: </span>
-            <span
-              className={
-                spent < lastMonthSpent ? 'text-green-600' : 'text-red-600'
-              }
-            >
-              {formatCurrency(lastMonthSpent)}
-            </span>
           </div>
         </CardContent>
       </Card>

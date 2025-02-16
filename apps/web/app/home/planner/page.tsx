@@ -8,7 +8,10 @@ import type { BudgetCategory, BudgetPlan } from './_components/types';
 export default async function BudgetPlannerPage() {
   const supabase = getSupabaseServerClient();
   const { data: rawPlans } = await supabase.from('budget_plans').select('*');
-
+  const currentMonth = new Date().toLocaleString('en-US', {
+    month: 'long',
+  });
+  const currentYear = new Date().getFullYear();
   const plans = rawPlans?.map((plan) => ({
     id: plan.id,
     month: plan.month,
@@ -17,8 +20,13 @@ export default async function BudgetPlannerPage() {
     categories: (plan.categories as BudgetCategory[]) ?? [],
   })) as BudgetPlan[] | null;
 
-  const initialPlan = plans?.[0] ?? null;
+  const initialPlan =
+    plans?.find(
+      (plan) => plan.month === currentMonth && plan.year === currentYear,
+    ) ?? null;
 
+  console.log('plans', plans);
+  console.log('initialPlan', initialPlan);
   return (
     <>
       <PageHeader title={'Budget Planner'} description={''} />

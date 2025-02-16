@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { createBudgetPlan, updateBudgetPlan } from '../server/server-actions';
 import { BudgetChart } from './BudgetChart';
 import { BudgetOverview } from './BudgetOverview';
@@ -20,7 +18,6 @@ export function ClientBudgetPlanner({
   initialPlans,
   initialSelectedPlan,
 }: Props) {
-  const router = useRouter();
   const [plans, setPlans] = useState<BudgetPlan[]>(initialPlans ?? []);
   const [selectedPlan, setSelectedPlan] = useState<BudgetPlan | null>(
     initialSelectedPlan,
@@ -32,8 +29,9 @@ export function ClientBudgetPlanner({
   };
 
   const handleCreatePlan = async (newPlan: Omit<BudgetPlan, 'id'>) => {
-    await createBudgetPlan(newPlan);
-    router.refresh();
+    const createdPlan = await createBudgetPlan(newPlan);
+    setPlans((prev) => [...prev, createdPlan] as BudgetPlan[]);
+    setSelectedPlan(createdPlan as BudgetPlan);
   };
 
   const handleUpdatePlan = async (updatedPlan: BudgetPlan) => {

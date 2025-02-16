@@ -3,6 +3,13 @@ export type BudgetCategory = {
   name: string;
   allocated: number;
   spent: number;
+  items: BudgetItem[];
+};
+
+export type BudgetItem = {
+  id: number;
+  name: string;
+  amount: number;
 };
 
 export type BudgetPlan = {

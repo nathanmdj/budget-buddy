@@ -41,7 +41,9 @@ export function BudgetPlanManager({
   onCreatePlan,
   onUpdatePlan,
 }: Props) {
-  const [editedPlan, setEditedPlan] = useState<BudgetPlan | null>(null);
+  const [editedPlan, setEditedPlan] = useState<BudgetPlan | null>(
+    selectedPlan ?? null,
+  );
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const currentIndex = selectedPlan
@@ -102,7 +104,6 @@ export function BudgetPlanManager({
   const handleSaveEdit = () => {
     if (!editedPlan) return;
     onUpdatePlan(editedPlan);
-    setEditedPlan(null);
   };
 
   if (!selectedPlan) {

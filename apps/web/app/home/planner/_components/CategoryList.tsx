@@ -3,8 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { Progress } from '@kit/ui/progress';
 
+import { formatCurrency } from '~/lib/utils';
+
 import type { BudgetCategory } from './types';
-import { formatCurrency } from './types';
 
 export function CategoryList({ categories }: { categories: BudgetCategory[] }) {
   return (

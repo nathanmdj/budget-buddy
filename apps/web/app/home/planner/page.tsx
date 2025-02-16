@@ -1,12 +1,23 @@
+import { getSupabaseServerClient } from '@kit/supabase/server-client';
 import { PageHeader } from '@kit/ui/page';
 import { PageBody } from '@kit/ui/page';
 
 import { ClientBudgetPlanner } from './_components/ClientBudgetPlanner';
-import { getBudgetPlans } from './server/actions';
+import type { BudgetCategory, BudgetPlan } from './_components/types';
 
 export default async function BudgetPlannerPage() {
-  const plans = await getBudgetPlans();
-  const initialPlan = plans[0] ?? null;
+  const supabase = getSupabaseServerClient();
+  const { data: rawPlans } = await supabase.from('budget_plans').select('*');
+
+  const plans = rawPlans?.map((plan) => ({
+    id: plan.id,
+    month: plan.month,
+    year: plan.year,
+    income: plan.income,
+    categories: (plan.categories as BudgetCategory[]) ?? [],
+  })) as BudgetPlan[] | null;
+
+  const initialPlan = plans?.[0] ?? null;
 
   return (
     <>

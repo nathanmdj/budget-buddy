@@ -29,7 +29,7 @@ import type { BudgetCategory, BudgetPlan } from './types';
 type Props = {
   plans: BudgetPlan[];
   selectedPlan: BudgetPlan | null;
-  onSelectPlan: (id: number) => void;
+  onSelectPlan: (id: string) => void;
   onCreatePlan: (plan: Omit<BudgetPlan, 'id'>) => void;
   onUpdatePlan: (plan: BudgetPlan) => void;
 };

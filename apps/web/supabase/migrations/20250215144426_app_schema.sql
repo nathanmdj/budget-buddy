@@ -74,8 +74,7 @@ CREATE TABLE IF NOT EXISTS public.budget_plans (
     month TEXT NOT NULL,
     year INTEGER NOT NULL,
     income NUMERIC(10,2) NOT NULL DEFAULT 0,
-    categories_allocated JSONB NOT NULL DEFAULT '{}',
-    categories_spent JSONB NOT NULL DEFAULT '{}',
+    categories JSONB NOT NULL DEFAULT '[{}]',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );

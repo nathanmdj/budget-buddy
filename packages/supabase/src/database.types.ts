@@ -40,6 +40,7 @@ export type Database = {
           created_by: string | null
           email: string | null
           id: string
+          monthly_income: number
           name: string
           picture_url: string | null
           public_data: Json
@@ -51,6 +52,7 @@ export type Database = {
           created_by?: string | null
           email?: string | null
           id?: string
+          monthly_income?: number
           name: string
           picture_url?: string | null
           public_data?: Json
@@ -62,6 +64,7 @@ export type Database = {
           created_by?: string | null
           email?: string | null
           id?: string
+          monthly_income?: number
           name?: string
           picture_url?: string | null
           public_data?: Json
@@ -69,6 +72,47 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      budget_plans: {
+        Row: {
+          account_id: string
+          categories: Json
+          created_at: string | null
+          id: string
+          income: number
+          month: string
+          updated_at: string | null
+          year: number
+        }
+        Insert: {
+          account_id: string
+          categories?: Json
+          created_at?: string | null
+          id?: string
+          income?: number
+          month: string
+          updated_at?: string | null
+          year: number
+        }
+        Update: {
+          account_id?: string
+          categories?: Json
+          created_at?: string | null
+          id?: string
+          income?: number
+          month?: string
+          updated_at?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_plans_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fund_accounts: {
         Row: {

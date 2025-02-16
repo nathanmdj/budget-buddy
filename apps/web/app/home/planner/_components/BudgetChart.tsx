@@ -1,5 +1,7 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 
@@ -22,16 +24,44 @@ const CHART_COLORS = [
   '#4BC0C0',
 ];
 
-export function BudgetChart({ categories }: { categories: BudgetCategory[] }) {
-  const chartData = {
-    labels: categories.map((category) => category.name),
-    datasets: [
+export function BudgetChart({
+  categories,
+  income,
+}: {
+  categories: BudgetCategory[];
+  income: number;
+}) {
+  const totalBudget = categories.reduce(
+    (sum, category) => sum + category.allocated,
+    0,
+  );
+
+  const categoriesWithUnallocated = useMemo(() => {
+    const unallocatedAmount = income - totalBudget;
+    if (unallocatedAmount <= 0) return categories;
+
+    return [
+      ...categories,
       {
-        data: categories.map((category) => category.allocated),
-        backgroundColor: CHART_COLORS,
+        id: categories.length + 1,
+        name: 'Unallocated',
+        allocated: unallocatedAmount,
+        spent: 0,
       },
-    ],
-  };
+    ];
+  }, [categories, income, totalBudget]);
+
+  const chartData = useMemo(() => {
+    return {
+      labels: categoriesWithUnallocated.map((category) => category.name),
+      datasets: [
+        {
+          data: categoriesWithUnallocated.map((category) => category.allocated),
+          backgroundColor: CHART_COLORS,
+        },
+      ],
+    };
+  }, [categoriesWithUnallocated]);
 
   return (
     <Card>

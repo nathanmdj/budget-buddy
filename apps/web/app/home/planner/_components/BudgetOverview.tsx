@@ -3,8 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { Progress } from '@kit/ui/progress';
 
+import { formatCurrency } from '~/lib/utils';
+
 import type { BudgetPlan } from './types';
-import { formatCurrency } from './types';
 
 export function BudgetOverview({ plan }: { plan: BudgetPlan }) {
   const totalBudget = plan.categories.reduce(
@@ -36,7 +37,7 @@ export function BudgetOverview({ plan }: { plan: BudgetPlan }) {
             <span className="font-semibold">{formatCurrency(totalSpent)}</span>
           </div>
         </div>
-        <Progress value={(totalSpent / plan.income) * 100} className="mt-4" />
+        <Progress value={(totalSpent / totalBudget) * 100} className="mt-4" />
       </CardContent>
     </Card>
   );

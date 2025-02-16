@@ -6,7 +6,7 @@ export type BudgetCategory = {
 };
 
 export type BudgetPlan = {
-  id: number;
+  id: string;
   month: string;
   year: number;
   income: number;
